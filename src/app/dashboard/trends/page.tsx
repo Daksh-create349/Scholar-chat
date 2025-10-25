@@ -13,6 +13,7 @@ import { analyzeTrendsInPapers } from '@/ai/flows/analyze-trends-in-papers';
 type ChartData = {
   topic: string;
   count: number;
+  fill: string;
 };
 
 const chartConfig = {
@@ -40,8 +41,10 @@ export default function TrendsPage() {
         setChartData([]);
 
         try {
+            // A simple way to create paper-like objects from raw text input
             const papers = inputText.split('\n\n').map(text => {
                 const parts = text.split('\n');
+                // Use the first line as title, the rest as abstract. If only one line, use it as abstract.
                 const title = parts.length > 1 ? parts[0] : `Paper ${Date.now()}`;
                 const abstract = parts.length > 1 ? parts.slice(1).join(' ') : text;
                 return { title, abstract };
@@ -53,7 +56,7 @@ export default function TrendsPage() {
                 try {
                     const parsedData = JSON.parse(result.visualizationData);
                     if (Array.isArray(parsedData) && parsedData.every(item => 'topic' in item && 'count' in item)) {
-                        const dataWithColors = parsedData.map((item, index) => ({
+                        const dataWithColors: ChartData[] = parsedData.map((item, index) => ({
                             ...item,
                             fill: chartColors[index % chartColors.length]
                         }));
@@ -132,9 +135,9 @@ export default function TrendsPage() {
                     <CardContent>
                          <ChartContainer config={chartConfig} className="h-[200px] w-full">
                             <ResponsiveContainer>
-                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 20 }}>
                                 <CartesianGrid vertical={false} />
-                                <XAxis dataKey="topic" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+                                <XAxis dataKey="topic" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} angle={-35} textAnchor="end" />
                                 <YAxis />
                                 <Tooltip cursor={false} content={<ChartTooltipContent />} />
                                 <Bar dataKey="count" radius={4}>
