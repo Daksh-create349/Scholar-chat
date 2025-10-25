@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bookmark, Star, ExternalLink } from "lucide-react";
+import { Bookmark, Star, ExternalLink, FileText } from "lucide-react";
 import type { Paper } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { AddToCollectionDialog } from "./add-to-collection-dialog";
+import { PaperActionDialog } from "./paper-action-dialog";
 import { useState } from "react";
 
 interface PaperCardProps {
@@ -21,11 +22,12 @@ interface PaperCardProps {
 }
 
 export function PaperCard({ paper }: PaperCardProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [collectionDialogOpen, setCollectionDialogOpen] = useState(false);
+  const [actionDialogOpen, setActionDialogOpen] = useState(false);
 
   return (
     <>
-      <Card className="flex flex-col">
+      <Card className="flex flex-col cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1" onClick={() => setActionDialogOpen(true)}>
         <CardHeader>
           <CardTitle className="text-lg font-headline leading-snug">{paper.title}</CardTitle>
           <CardDescription className="text-sm pt-1">
@@ -55,28 +57,31 @@ export function PaperCard({ paper }: PaperCardProps) {
             ))}
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between items-center">
+        <CardFooter className="flex justify-between items-center bg-secondary/30 p-3 mt-auto">
            <Button
             variant="ghost"
             size="sm"
-            onClick={() => setDialogOpen(true)}
+            onClick={(e) => { e.stopPropagation(); setCollectionDialogOpen(true); }}
             className="text-muted-foreground hover:text-primary"
           >
             <Bookmark className={cn("mr-2 h-4 w-4")} />
             Bookmark
           </Button>
-          <Button variant="outline" size="sm" asChild>
-            <a href={paper.url} target="_blank" rel="noopener noreferrer">
-              Read Paper
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </a>
+          <Button variant="ghost" size="sm" className="text-muted-foreground">
+            Actions
+            <FileText className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
       </Card>
       <AddToCollectionDialog 
         paper={paper}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        open={collectionDialogOpen}
+        onOpenChange={setCollectionDialogOpen}
+      />
+      <PaperActionDialog
+        paper={paper}
+        open={actionDialogOpen}
+        onOpenChange={setActionDialogOpen}
       />
     </>
   );
