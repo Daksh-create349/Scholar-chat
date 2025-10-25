@@ -13,12 +13,13 @@ import {z} from 'genkit';
 const SummarizeResearchPaperInputSchema = z.object({
   paperText: z
     .string()
-    .describe("The text content of the research paper to be summarized."),
+    .describe("The text content (e.g., abstract) of the research paper to be summarized."),
 });
 export type SummarizeResearchPaperInput = z.infer<typeof SummarizeResearchPaperInputSchema>;
 
 const SummarizeResearchPaperOutputSchema = z.object({
-  summary: z.string().describe("A concise summary of the research paper's key findings."),
+  keyFindings: z.array(z.string()).describe("A list of the most important findings or results from the paper."),
+  implications: z.array(z.string()).describe("A list of the potential implications or significance of the research."),
 });
 export type SummarizeResearchPaperOutput = z.infer<typeof SummarizeResearchPaperOutputSchema>;
 
@@ -30,9 +31,13 @@ const prompt = ai.definePrompt({
   name: 'summarizeResearchPaperPrompt',
   input: {schema: SummarizeResearchPaperInputSchema},
   output: {schema: SummarizeResearchPaperOutputSchema},
-  prompt: `You are an expert research assistant tasked with summarizing research papers.
+  prompt: `You are an expert research analyst tasked with extracting insights from a research paper's abstract.
 
-  Provide a concise summary of the key findings of the following research paper.
+  Based on the following text, identify:
+  1. The key findings or results of the study.
+  2. The potential implications or significance of the work.
+  
+  Present your answer as two distinct lists.
 
   Research Paper Text: {{{paperText}}}`,
 });

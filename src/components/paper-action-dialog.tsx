@@ -29,26 +29,96 @@ export function PaperActionDialog({ paper, open, onOpenChange }: PaperActionDial
   const handleDownloadPdf = async () => {
     setIsGenerating(true);
     try {
-      const { summary } = await summarizeResearchPaper({ paperText: paper.abstract });
+      const { keyFindings, implications } = await summarizeResearchPaper({ paperText: paper.abstract });
 
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        orientation: 'p',
+        unit: 'pt',
+        format: 'a4'
+      });
+      const margin = 40;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const contentWidth = pageWidth - (margin * 2);
+      let y = 0;
 
+      // Title
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.text(paper.title, 15, 20, { maxWidth: 180 });
+      doc.setFontSize(20);
+      const titleLines = doc.splitTextToSize(paper.title, contentWidth);
+      y = margin + 10;
+      doc.text(titleLines, margin, y);
+      y += titleLines.length * 20;
+
+      // Authors
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      const authorText = `By: ${paper.authors.join(', ')}`;
+      const authorLines = doc.splitTextToSize(authorText, contentWidth);
+      y += 10;
+      doc.text(authorLines, margin, y);
+      y += authorLines.length * 10;
+      
+      // Meta Info
+      y += 5;
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const metaText = `Published: ${paper.publicationDate || 'N/A'}  |  Citations: ${paper.citations.toLocaleString()}`;
+      doc.text(metaText, margin, y);
+      y += 15;
+
+      // Separator
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 20;
+
+      // AI Summary Section
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(0);
+      doc.text('AI-Generated Insights', margin, y);
+      y += 15;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Key Findings:', margin, y);
+      y += 12;
+      doc.setFont('helvetica', 'normal');
+      const findingsLines = doc.splitTextToSize(`- ${keyFindings.join('\n- ')}`, contentWidth - 10);
+      doc.text(findingsLines, margin + 10, y);
+      y += (findingsLines.length * 10) + 10;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Implications:', margin, y);
+      y += 12;
+      doc.setFont('helvetica', 'normal');
+      const implicationsLines = doc.splitTextToSize(`- ${implications.join('\n- ')}`, contentWidth - 10);
+      doc.text(implicationsLines, margin + 10, y);
+      y += (implicationsLines.length * 10) + 20;
+
+      // Original Abstract Section
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 20;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('Original Abstract', margin, y);
+      y += 15;
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.text(paper.authors.join(', '), 15, 30, { maxWidth: 180 });
+      const abstractLines = doc.splitTextToSize(paper.abstract, contentWidth);
+      doc.text(abstractLines, margin, y);
+      y += (abstractLines.length * 10) + 15;
+      
+      // Footer with URL
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(`Source: ${paper.url}`, margin, doc.internal.pageSize.getHeight() - margin + 10);
 
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text('AI-Generated Summary', 15, 45);
-      
-      doc.setFont('helvetica', 'normal');
-      doc.text(doc.splitTextToSize(summary, 180), 15, 52);
-      
-      doc.save(`${paper.title.slice(0, 20).replace(/\s/g, '_')}_summary.pdf`);
+
+      doc.save(`${paper.title.slice(0, 20).replace(/\s/g, '_')}_analysis.pdf`);
 
     } catch (error) {
       console.error("Failed to generate PDF summary", error);
@@ -92,7 +162,7 @@ export function PaperActionDialog({ paper, open, onOpenChange }: PaperActionDial
                 ) : (
                     <Download className="mr-2" />
                 )}
-                <span>Download AI Summary (PDF)</span>
+                <span>Download AI Analysis (PDF)</span>
             </Button>
         </div>
 
