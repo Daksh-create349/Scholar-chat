@@ -24,7 +24,7 @@ const FindRelevantPapersOutputSchema = z.object({
   papers: z.array(
     z.object({
       title: z.string().describe('The title of the research paper.'),
-      summary: z.string().describe('A concise summary of the paper.'),
+      abstract: z.string().describe('A concise abstract of the paper.'),
       url: z.string().url().describe('URL of the research paper.'),
       authors: z.array(z.string()).optional().describe('The authors of the paper.'),
     })
@@ -45,8 +45,8 @@ const findRelevantPapersPrompt = ai.definePrompt({
 
   Instructions:
   1. Use the searchPapers tool to search for research papers and articles online based on the given keywords.
-  2. For each paper found, extract the title, a concise summary, the URL, and the authors.
-  3. Return a JSON array of research papers, each with the fields: title, summary, url, and authors.
+  2. For each paper found, extract the title, abstract, URL, and authors.
+  3. Return a JSON array of research papers, each with the fields: title, abstract, url, and authors.
 
   Keywords: {{{keywords}}}
   `,

@@ -45,7 +45,7 @@ function SearchPageComponent() {
         title: p.title,
         authors: p.authors || [],
         publicationDate: "", // AI flow doesn't provide date
-        abstract: p.summary,
+        abstract: p.abstract,
         citations: 0, // AI flow doesn't provide citations
         url: p.url,
         tags: [], // AI flow doesn't provide tags
