@@ -135,9 +135,9 @@ export default function TrendsPage() {
                     <CardContent>
                          <ChartContainer config={chartConfig} className="h-[200px] w-full">
                             <ResponsiveContainer>
-                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 20 }}>
+                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 40 }}>
                                 <CartesianGrid vertical={false} />
-                                <XAxis dataKey="topic" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} angle={-35} textAnchor="end" />
+                                <XAxis dataKey="topic" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} angle={-35} textAnchor="end" interval={0} />
                                 <YAxis />
                                 <Tooltip cursor={false} content={<ChartTooltipContent />} />
                                 <Bar dataKey="count" radius={4}>
