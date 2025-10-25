@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { chatWithResearchField } from "@/ai/flows/chat-with-research-field";
 
 type Message = {
   id: string;
@@ -29,25 +30,35 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { id: Date.now().toString(), text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput("");
     setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse: Message = { 
-        id: (Date.now() + 1).toString(), 
-        text: "The latest findings in quantum computing indicate significant progress in error correction codes, enabling more stable qubit states for longer durations. Researchers at MIT have demonstrated a novel approach using topological materials that could pave the way for fault-tolerant quantum computers.", 
-        sender: 'bot' 
-      };
-      setMessages(prev => [...prev, botResponse]);
-      setIsLoading(false);
-    }, 1500);
+    try {
+        const result = await chatWithResearchField({ query: currentInput });
+        const botResponse: Message = {
+            id: (Date.now() + 1).toString(),
+            text: result.answer,
+            sender: 'bot'
+        };
+        setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+        console.error("Failed to get response from AI", error);
+        const errorResponse: Message = {
+            id: (Date.now() + 1).toString(),
+            text: "Sorry, I'm having trouble connecting to my knowledge base. Please try again.",
+            sender: 'bot'
+        };
+        setMessages(prev => [...prev, errorResponse]);
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (
