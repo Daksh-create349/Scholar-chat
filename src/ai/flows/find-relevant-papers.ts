@@ -48,9 +48,6 @@ const findRelevantPapersPrompt = ai.definePrompt({
   3. Return a JSON array of research papers, each with the fields: title, summary, and url.
 
   Keywords: {{{keywords}}}
-
-  Output the results in JSON format:
-  {{$instructions=Output the results in JSON format}}
   `,config: {
     safetySettings: [
       {
