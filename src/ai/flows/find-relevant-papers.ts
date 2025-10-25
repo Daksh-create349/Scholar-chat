@@ -36,38 +36,24 @@ export async function findRelevantPapers(input: FindRelevantPapersInput): Promis
   return findRelevantPapersFlow(input);
 }
 
-const findRelevantPapersPrompt = ai.definePrompt({
-  name: 'findRelevantPapersPrompt',
-  input: {schema: FindRelevantPapersInputSchema},
-  output: {schema: FindRelevantPapersOutputSchema},
-  tools: [searchPapers],
-  prompt: `You are an AI research assistant. Your task is to find relevant research papers based on the keywords provided by the user.
-
-  Instructions:
-  1. Use the searchPapers tool to search for research papers and articles online based on the given keywords.
-  2. For each paper found, extract the title, abstract, URL, and authors.
-  3. Return a JSON array of research papers, each with the fields: title, abstract, url, and authors.
-
-  Keywords: {{{keywords}}}
-  `,
-  config: {
-    safetySettings: [
-      {
-        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_ONLY_HIGH',
-      },
-    ],
-  },
-});
-
 const findRelevantPapersFlow = ai.defineFlow(
   {
     name: 'findRelevantPapersFlow',
     inputSchema: FindRelevantPapersInputSchema,
     outputSchema: FindRelevantPapersOutputSchema,
   },
-  async input => {
-    const {output} = await findRelevantPapersPrompt(input);
-    return output!;
+  async (input) => {
+    // Directly call the searchPapers tool with the input keywords
+    const searchResults = await searchPapers({ query: input.keywords });
+
+    // Format the tool's output to match the flow's output schema
+    const papers = searchResults.map(paper => ({
+      title: paper.title,
+      abstract: paper.abstract,
+      url: paper.url,
+      authors: paper.authors,
+    }));
+
+    return { papers };
   }
 );
