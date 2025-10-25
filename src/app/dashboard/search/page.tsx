@@ -23,6 +23,7 @@ import { ListFilter, Search as SearchIcon, Loader2 } from "lucide-react";
 import { PaperCard } from "@/components/paper-card";
 import { findRelevantPapers, FindRelevantPapersOutput } from "@/ai/flows/find-relevant-papers";
 import type { Paper } from "@/lib/types";
+import { Card, CardContent } from "@/components/ui/card";
 
 function SearchPageComponent() {
   const router = useRouter();
