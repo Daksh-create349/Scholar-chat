@@ -15,8 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import {
   useAuth,
   useUser,
-  initiateEmailSignUp,
-  initiateEmailSignIn,
+  initiateAnonymousSignIn,
 } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -37,40 +36,18 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleAuthAction = async (action: 'signIn' | 'signUp', e: FormEvent) => {
+  const handleAuthAction = async (e: FormEvent) => {
     e.preventDefault();
-    if (!auth || !email || !password) return;
+    if (!auth) return;
     setIsLoading(true);
     try {
-      if (action === 'signUp') {
-        await initiateEmailSignUp(auth, email, password);
-      } else {
-        await initiateEmailSignIn(auth, email, password);
-      }
-      // The onAuthStateChanged listener in the provider will handle the redirect.
+      // For testing, sign in anonymously regardless of input.
+      initiateAnonymousSignIn(auth);
+      // The onAuthStateChanged listener will handle the redirect.
     } catch (error: any) {
-      let errorMessage = 'An unexpected error occurred.';
-      if (error instanceof FirebaseError) {
-        switch (error.code) {
-          case 'auth/user-not-found':
-          case 'auth/wrong-password':
-          case 'auth/invalid-credential':
-            errorMessage = 'Invalid email or password. Please try again.';
-            break;
-          case 'auth/email-already-in-use':
-            errorMessage = 'This email is already in use. Please sign in.';
-            break;
-          case 'auth/weak-password':
-            errorMessage = 'The password is too weak. Please use at least 6 characters.';
-            break;
-          default:
-            errorMessage = error.message;
-            break;
-        }
-      }
       toast({
         title: 'Authentication Failed',
-        description: errorMessage,
+        description: 'Could not sign in anonymously.',
         variant: 'destructive',
       });
       setIsLoading(false);
@@ -89,19 +66,19 @@ export default function LoginPage() {
     <div className="flex h-screen w-full items-center justify-center bg-background px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-headline">Welcome</CardTitle>
+          <CardTitle className="text-2xl font-headline">Test Login</CardTitle>
           <CardDescription>
-            Sign in or create an account to continue
+            Enter any details to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleAuthAction}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="researcher@university.edu"
+                placeholder="test@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -122,20 +99,11 @@ export default function LoginPage() {
         <CardFooter className="flex flex-col gap-4">
           <Button
             className="w-full"
-            onClick={(e) => handleAuthAction('signIn', e)}
-            disabled={isLoading || !email || !password}
+            onClick={handleAuthAction}
+            disabled={isLoading}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign In
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={(e) => handleAuthAction('signUp', e)}
-            disabled={isLoading || !email || !password}
-          >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign Up
+            Sign In / Sign Up
           </Button>
         </CardFooter>
       </Card>
