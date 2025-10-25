@@ -43,7 +43,7 @@ function SearchPageComponent() {
       const papersData: Paper[] = results.papers.map((p, index) => ({
         id: (Date.now() + index).toString(),
         title: p.title,
-        authors: [], // AI flow doesn't provide authors
+        authors: p.authors || [],
         publicationDate: "", // AI flow doesn't provide date
         abstract: p.summary,
         citations: 0, // AI flow doesn't provide citations
@@ -65,7 +65,7 @@ function SearchPageComponent() {
       setSearchQuery(query);
       handleSearch(query);
     }
-  }, [searchParams]);
+  }, []);
 
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

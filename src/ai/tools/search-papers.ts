@@ -18,37 +18,38 @@ const PaperSearchSchema = z.object({
 export const searchPapers = ai.defineTool(
   {
     name: 'searchPapers',
-    description: 'Searches for research papers based on a query.',
+    description: 'Searches for research papers based on a query using the Semantic Scholar API.',
     inputSchema: z.object({ query: z.string() }),
     outputSchema: z.array(PaperSearchSchema),
   },
   async (input) => {
-    // In a real application, you would use a service like Semantic Scholar, arXiv API, etc.
-    // For this example, we'll simulate a search.
     console.log(`Searching for papers with query: ${input.query}`);
     
-    // This is a simplified mock response.
-    const mockResults = [
-        {
-            title: 'Attention Is All You Need',
-            authors: ['Ashish Vaswani', 'Noam Shazeer', 'Niki Parmar', 'Jakob Uszkoreit', 'Llion Jones', 'Aidan N. Gomez', 'Łukasz Kaiser', 'Illia Polosukhin'],
-            url: 'https://arxiv.org/abs/1706.03762',
-            abstract: 'The dominant sequence transduction models are based on complex recurrent or convolutional neural networks... We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.',
-        },
-        {
-            title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding',
-            authors: ['Jacob Devlin', 'Ming-Wei Chang', 'Kenton Lee', 'Kristina Toutanova'],
-            url: 'https://arxiv.org/abs/1810.04805',
-            abstract: 'We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text...',
-        }
-    ];
+    const searchUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(input.query)}&fields=title,authors,abstract,url&limit=20`;
 
-    // Filter results based on query for a more realistic simulation
-    const filteredResults = mockResults.filter(paper => 
-        paper.title.toLowerCase().includes(input.query.toLowerCase()) ||
-        paper.abstract.toLowerCase().includes(input.query.toLowerCase())
-    );
+    try {
+      const response = await fetch(searchUrl);
+      if (!response.ok) {
+        throw new Error(`Semantic Scholar API request failed with status ${response.status}`);
+      }
+      const data = await response.json();
 
-    return filteredResults.length > 0 ? filteredResults : mockResults;
+      if (!data.data) {
+        return [];
+      }
+      
+      const results = data.data.map((paper: any) => ({
+        title: paper.title || 'No title available',
+        authors: paper.authors ? paper.authors.map((author: any) => author.name) : [],
+        url: paper.url || `https://www.semanticscholar.org/paper/${paper.paperId}`,
+        abstract: paper.abstract || 'No abstract available.',
+      }));
+
+      return results;
+    } catch (error) {
+      console.error('Error fetching from Semantic Scholar API:', error);
+      // Return an empty array or handle the error as appropriate
+      return [];
+    }
   }
 );
