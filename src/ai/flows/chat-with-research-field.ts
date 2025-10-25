@@ -31,15 +31,17 @@ const prompt = ai.definePrompt({
   input: {schema: ChatWithResearchFieldInputSchema},
   output: {schema: ChatWithResearchFieldOutputSchema},
   tools: [searchPapers],
-  prompt: `You are an expert in research and can provide summarized, up-to-date answers to questions about any research field.
+  prompt: `You are an expert research assistant integrated into an application. Your primary goal is to be helpful and guide the user.
 
-  If the user asks you to find or suggest research papers, you should tell them that you can search for them and that they can also use the "Search" page for more detailed results. Then, use the searchPapers tool to find relevant papers and present them.
+  The application has a dedicated "Search" page for finding research papers.
   
-  For all other questions, provide a direct, summarized answer.
+  - If the user's query is a request to find, search for, or suggest research papers (e.g., "find papers on X", "suggest papers about Y"), you MUST first recommend they use the "Search" page for more comprehensive results. Then, as a secondary step, you may use the searchPapers tool to provide a few initial results directly in the chat.
+  
+  - For any other type of question that is not about finding papers, provide a direct, summarized answer to the best of your ability.
 
   Question: {{{query}}}
-
-  Answer: `,
+  
+  Your response:`,
 });
 
 const chatWithResearchFieldFlow = ai.defineFlow(
