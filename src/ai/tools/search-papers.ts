@@ -38,12 +38,14 @@ export const searchPapers = ai.defineTool(
         return [];
       }
       
-      const results = data.data.map((paper: any) => ({
-        title: paper.title || 'No title available',
-        authors: paper.authors ? paper.authors.map((author: any) => author.name) : [],
-        url: paper.url || `https://www.semanticscholar.org/paper/${paper.paperId}`,
-        abstract: paper.abstract || 'No abstract available.',
-      }));
+      const results = data.data
+        .filter((paper: any) => paper.title && paper.url && paper.abstract) // Filter out papers with missing essential fields
+        .map((paper: any) => ({
+          title: paper.title,
+          authors: paper.authors ? paper.authors.map((author: any) => author.name) : [],
+          url: paper.url,
+          abstract: paper.abstract,
+        }));
 
       return results;
     } catch (error) {
