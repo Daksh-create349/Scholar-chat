@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -29,7 +30,7 @@ export type AnalyzeTrendsInPapersInput = z.infer<typeof AnalyzeTrendsInPapersInp
 
 const AnalyzeTrendsInPapersOutputSchema = z.object({
   trendAnalysis: z.string().describe('An analysis of the emerging trends and connections between the research papers.'),
-  visualizationData: z.string().optional().describe('Data for visualizing the trends, such as a JSON format for a graph.'),
+  visualizationData: z.string().optional().describe('Data for visualizing the trends, as a JSON string for a bar chart. The JSON should be an array of objects, each with a "topic" (string) and "count" (number) property. For example: [{"topic": "NLP", "count": 120}]'),
 });
 
 export type AnalyzeTrendsInPapersOutput = z.infer<typeof AnalyzeTrendsInPapersOutputSchema>;
@@ -56,11 +57,9 @@ Abstract: {{this.abstract}}
 ---
 {{/each}}
 
-Analyze the papers and identify key trends, common themes, and potential connections between the research areas. Provide a summary of your analysis and, if possible, suggest a format for visualizing these trends (e.g., a graph structure in JSON format where nodes are papers and edges represent connections). Focus on identifying promising areas for future research.
+Analyze the papers and identify key trends, common themes, and potential connections between the research areas. Provide a summary of your analysis. Also, generate a JSON string for a bar chart that shows the frequency of the top 5-7 most important topics or keywords you identified. The JSON should be an array of objects, each with a "topic" and "count" property. Focus on identifying promising areas for future research.
 
-Format your output as follows:
-Trend Analysis: [your analysis here]
-Visualization Data: [JSON data for visualization, if applicable]`,
+`,
 });
 
 const analyzeTrendsInPapersFlow = ai.defineFlow(

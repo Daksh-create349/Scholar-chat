@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -7,15 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Lightbulb, Loader2 } from "lucide-react";
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { analyzeTrendsInPapers } from '@/ai/flows/analyze-trends-in-papers';
 
-const chartData = [
-  { topic: 'Transformers', count: 186 },
-  { topic: 'NLP', count: 120 },
-  { topic: 'BERT', count: 95 },
-  { topic: 'Deep Learning', count: 80 },
-  { topic: 'Computer Vision', count: 70 },
-  { topic: 'ResNet', count: 65 },
-];
+type ChartData = {
+  topic: string;
+  count: number;
+};
 
 const chartConfig = {
   count: {
@@ -27,13 +25,41 @@ const chartConfig = {
 export default function TrendsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [analysisResult, setAnalysisResult] = useState("");
+    const [inputText, setInputText] = useState("");
+    const [chartData, setChartData] = useState<ChartData[]>([]);
 
-    const handleAnalysis = () => {
+    const handleAnalysis = async () => {
+        if (!inputText.trim()) return;
         setIsLoading(true);
-        setTimeout(() => {
-            setAnalysisResult("Based on the provided papers, a clear trend emerges towards the application of Transformer architectures beyond their original NLP domain. There's a significant overlap with Computer Vision, particularly in models like Vision Transformer (ViT). Another key trend is the focus on pre-training large models on massive datasets, with BERT being a foundational example that has inspired subsequent work in creating more efficient and powerful language representations. A promising area for future research is the fusion of these large language models with structured knowledge graphs.");
+        setAnalysisResult("");
+        setChartData([]);
+
+        try {
+            const papers = inputText.split('\n\n').map(text => {
+                const parts = text.split('\n');
+                const title = parts.length > 1 ? parts[0] : `Paper ${Date.now()}`;
+                const abstract = parts.length > 1 ? parts.slice(1).join(' ') : text;
+                return { title, abstract };
+            });
+
+            const result = await analyzeTrendsInPapers({ papers });
+            setAnalysisResult(result.trendAnalysis);
+            if (result.visualizationData) {
+                try {
+                    const parsedData = JSON.parse(result.visualizationData);
+                    if (Array.isArray(parsedData) && parsedData.every(item => 'topic' in item && 'count' in item)) {
+                        setChartData(parsedData);
+                    }
+                } catch (e) {
+                    console.error("Failed to parse visualization data", e);
+                }
+            }
+        } catch (error) {
+            console.error("Analysis failed", error);
+            setAnalysisResult("An error occurred during analysis. Please try again.");
+        } finally {
             setIsLoading(false);
-        }, 1500);
+        }
     }
 
   return (
@@ -50,15 +76,18 @@ export default function TrendsPage() {
           <CardHeader>
             <CardTitle>Analyze Papers</CardTitle>
             <CardDescription>
-              Paste abstracts or topics (one per line) to identify trends.
+              Paste abstracts or topics (separated by a blank line) to identify trends.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder="Start by pasting content here..."
+              placeholder="Start by pasting content here... Separate papers with a blank line."
               className="min-h-[200px]"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              disabled={isLoading}
             />
-            <Button onClick={handleAnalysis} disabled={isLoading} className="w-full">
+            <Button onClick={handleAnalysis} disabled={isLoading || !inputText.trim()} className="w-full">
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -75,11 +104,11 @@ export default function TrendsPage() {
             <CardHeader>
                 <CardTitle>Analysis & Visualization</CardTitle>
                 <CardDescription>
-                Identified trends and keyword frequency.
+                {isLoading ? "Generating analysis..." : "Identified trends and keyword frequency."}
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col gap-4">
-                {analysisResult && (
+                {analysisResult && !isLoading && (
                     <div className="p-4 rounded-lg bg-secondary/50 border border-secondary">
                         <div className="flex items-start gap-3">
                             <Lightbulb className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
