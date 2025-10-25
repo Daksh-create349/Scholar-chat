@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,9 +18,14 @@ type ChartData = {
 const chartConfig = {
   count: {
     label: "Mentions",
-    color: "hsl(var(--primary))",
   },
+  topic: {
+    label: "Topic",
+  }
 } satisfies ChartConfig;
+
+
+const chartColors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
 export default function TrendsPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +53,11 @@ export default function TrendsPage() {
                 try {
                     const parsedData = JSON.parse(result.visualizationData);
                     if (Array.isArray(parsedData) && parsedData.every(item => 'topic' in item && 'count' in item)) {
-                        setChartData(parsedData);
+                        const dataWithColors = parsedData.map((item, index) => ({
+                            ...item,
+                            fill: chartColors[index % chartColors.length]
+                        }));
+                        setChartData(dataWithColors);
                     }
                 } catch (e) {
                     console.error("Failed to parse visualization data", e);
@@ -123,12 +132,16 @@ export default function TrendsPage() {
                     <CardContent>
                          <ChartContainer config={chartConfig} className="h-[200px] w-full">
                             <ResponsiveContainer>
-                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                                <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                                 <CartesianGrid vertical={false} />
                                 <XAxis dataKey="topic" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
                                 <YAxis />
                                 <Tooltip cursor={false} content={<ChartTooltipContent />} />
-                                <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                                <Bar dataKey="count" radius={4}>
+                                   {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                                    ))}
+                                </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
                         </ChartContainer>
