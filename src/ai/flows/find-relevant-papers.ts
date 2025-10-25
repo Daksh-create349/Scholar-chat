@@ -49,7 +49,8 @@ const findRelevantPapersPrompt = ai.definePrompt({
   3. Return a JSON array of research papers, each with the fields: title, summary, url, and authors.
 
   Keywords: {{{keywords}}}
-  `,config: {
+  `,
+  config: {
     safetySettings: [
       {
         category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
