@@ -11,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { searchPapers } from '../tools/search-papers';
 
 const FindRelevantPapersInputSchema = z.object({
   keywords: z
@@ -38,10 +39,11 @@ const findRelevantPapersPrompt = ai.definePrompt({
   name: 'findRelevantPapersPrompt',
   input: {schema: FindRelevantPapersInputSchema},
   output: {schema: FindRelevantPapersOutputSchema},
+  tools: [searchPapers],
   prompt: `You are an AI research assistant. Your task is to find relevant research papers based on the keywords provided by the user.
 
   Instructions:
-  1. Search for research papers and articles online based on the given keywords.
+  1. Use the searchPapers tool to search for research papers and articles online based on the given keywords.
   2. For each paper found, extract the title, a concise summary, and the URL.
   3. Return a JSON array of research papers, each with the fields: title, summary, and url.
 
