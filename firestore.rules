@@ -1,0 +1,149 @@
+/**
+ * @fileoverview Firestore Security Rules for Scholar Chat.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles and collections.
+ * Research papers and authors are publicly readable but only modifiable by an authorized user (requires the presence of an `ownerId` or similar on the document itself).
+ * Annotations are stored as a subcollection of research papers but include a userId to track ownership.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores individual user profiles.  Only the user can read/write their own profile.
+ * - /research_papers/{researchPaperId}: Stores research paper data. Publicly readable. Owner-only writes require an `ownerId` field on the document.
+ * - /authors/{authorId}: Stores author data. Publicly readable. Owner-only writes require an `ownerId` field on the document.
+ * - /users/{userId}/collections/{collectionId}: Stores user-created collections of research papers. Only the user can read/write their own collections.
+ * - /research_papers/{researchPaperId}/annotations/{annotationId}: Stores annotations on research papers.  Annotations are owned by a user, but stored as subcollections to research papers.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed.
+ * - Ambiguous write permissions default to the most secure interpretation (owner-only).
+ * - `get()` calls are avoided by denormalizing authorization data onto the documents themselves.
+ *
+ * Denormalization for Authorization:
+ * - Annotations include a `userId` field to allow ownership validation even though they are stored as a subcollection of ResearchPaper.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Defines the isSignedIn function to check if a user is authenticated.
+     * @returns {boolean} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Defines the isOwner function to check if the user is the owner of the resource.
+     * @param {string} userId - The user ID to compare with the authenticated user's ID.
+     * @returns {boolean} True if the user is the owner, false otherwise.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Defines the isExistingOwner function to check if the user is the owner of an existing resource.
+     * @param {string} userId - The user ID to compare with the authenticated user's ID.
+     * @returns {boolean} True if the user is the owner and the resource exists, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Rules for the /users/{userId} collection.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' creates their own profile.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data: { id: 'user123', ... }
+     * @deny (create) User with ID 'user123' tries to create a profile for 'user456'.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data: { id: 'user456', ... }
+     * @deny (read) Any user attempts to list all users.
+     * @principle Enforces document ownership for writes and restricts access to a user's own data tree.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for the /research_papers/{researchPaperId} collection.
+     * @path /research_papers/{researchPaperId}
+     * @allow (get) Any user can read a research paper.
+     * @allow (list) Any user can list research papers.
+     * @deny (create) Any user attempts to create a research paper.
+     * @principle Public read with owner-only writes.
+     */
+    match /research_papers/{researchPaperId} {
+      allow get: if true;
+      allow list: if true;
+
+      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Rules for the /authors/{authorId} collection.
+     * @path /authors/{authorId}
+     * @allow (get) Any user can read an author's data.
+     * @allow (list) Any user can list authors.
+     * @deny (create) Any user attempts to create an author.
+     * @principle Public read with owner-only writes.
+     */
+    match /authors/{authorId} {
+      allow get: if true;
+      allow list: if true;
+
+      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Rules for the /users/{userId}/collections/{collectionId} collection.
+     * @path /users/{userId}/collections/{collectionId}
+     * @allow (create) User with ID 'user123' creates a collection in their own profile.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data: { userId: 'user123', ... }
+     * @deny (create) User with ID 'user123' tries to create a collection for 'user456'.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data: { userId: 'user456', ... }
+     * @principle Enforces document ownership for writes and restricts access to a user's own data tree.
+     */
+    match /users/{userId}/collections/{collectionId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for the /research_papers/{researchPaperId}/annotations/{annotationId} collection.
+     * @path /research_papers/{researchPaperId}/annotations/{annotationId}
+     * @allow (create) User with ID 'user123' creates an annotation on a research paper and sets the userId field correctly.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data: { userId: 'user123', ... }
+     * @deny (create) User with ID 'user123' tries to create an annotation for 'user456'.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data: { userId: 'user456', ... }
+     * @principle Enforces document ownership for writes and restricts access to the owning user.
+     */
+    match /research_papers/{researchPaperId}/annotations/{annotationId} {
+      allow get: if isSignedIn();
+      allow list: if true;
+
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

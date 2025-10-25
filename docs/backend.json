@@ -1,0 +1,275 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Scholar Chat application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name",
+        "createdAt"
+      ]
+    },
+    "ResearchPaper": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ResearchPaper",
+      "type": "object",
+      "description": "Represents a research paper or article.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the research paper."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the research paper."
+        },
+        "abstract": {
+          "type": "string",
+          "description": "Abstract or summary of the research paper."
+        },
+        "publicationDate": {
+          "type": "string",
+          "description": "Date when the research paper was published.",
+          "format": "date-time"
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the research paper.",
+          "format": "uri"
+        },
+        "authorIds": {
+          "type": "array",
+          "description": "References to Authors. (Relationship: Author N:N ResearchPaper)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "abstract",
+        "publicationDate",
+        "url"
+      ]
+    },
+    "Author": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Author",
+      "type": "object",
+      "description": "Represents an author of a research paper.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the author."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the author."
+        },
+        "affiliation": {
+          "type": "string",
+          "description": "Affiliation of the author (e.g., university, institution)."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Collection": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Collection",
+      "type": "object",
+      "description": "Represents a collection of research papers saved by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the collection."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Collection)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the collection."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the collection."
+        },
+        "researchPaperIds": {
+          "type": "array",
+          "description": "References to ResearchPapers. (Relationship: Collection N:N ResearchPaper)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name"
+      ]
+    },
+    "Annotation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Annotation",
+      "type": "object",
+      "description": "Represents an annotation on a research paper.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the annotation."
+        },
+        "researchPaperId": {
+          "type": "string",
+          "description": "Reference to ResearchPaper. (Relationship: ResearchPaper 1:N Annotation)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Annotation)"
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the annotation."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the annotation was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "researchPaperId",
+        "userId",
+        "content",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles.  Path-based ownership ensures only the user can access their own profile data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/research_papers/{researchPaperId}",
+        "definition": {
+          "entityName": "ResearchPaper",
+          "schema": {
+            "$ref": "#/backend/entities/ResearchPaper"
+          },
+          "description": "Stores research paper data.",
+          "params": [
+            {
+              "name": "researchPaperId",
+              "description": "The unique identifier of the research paper."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/authors/{authorId}",
+        "definition": {
+          "entityName": "Author",
+          "schema": {
+            "$ref": "#/backend/entities/Author"
+          },
+          "description": "Stores author data.",
+          "params": [
+            {
+              "name": "authorId",
+              "description": "The unique identifier of the author."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/collections/{collectionId}",
+        "definition": {
+          "entityName": "Collection",
+          "schema": {
+            "$ref": "#/backend/entities/Collection"
+          },
+          "description": "Stores collections of research papers created by users. Path-based ownership ensures only the user can access their own collections.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "collectionId",
+              "description": "The unique identifier of the collection."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/research_papers/{researchPaperId}/annotations/{annotationId}",
+        "definition": {
+          "entityName": "Annotation",
+          "schema": {
+            "$ref": "#/backend/entities/Annotation"
+          },
+          "description": "Stores annotations on research papers. Includes 'userId' for ownership validation.",
+          "params": [
+            {
+              "name": "researchPaperId",
+              "description": "The unique identifier of the research paper."
+            },
+            {
+              "name": "annotationId",
+              "description": "The unique identifier of the annotation."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure security, scalability, and ease of debugging, following the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). Authorization Independence is achieved through denormalization of authorization data. Path-Based Ownership and Membership Maps are used to model access consistently.\n\n*   **Users:** User data is stored under the `/users/{userId}` path, ensuring private data is directly associated with its owner. No `get()` calls are required to validate ownership.\n*   **ResearchPapers:** Research papers are stored in a flat `/research_papers` collection.  The `authorIds` array is used to represent the N:N relationship with Authors.\n*   **Authors:** Author data is stored in a flat `/authors` collection.\n*   **Collections:** Collections are stored under the `/users/{userId}/collections/{collectionId}` path.  This ensures that collections are owned by a user, and security rules can easily enforce that only the user can access their own collections.\n*   **Annotations:** Annotations are stored under the `/research_papers/{researchPaperId}/annotations/{annotationId}` path. While the User owns the Annotation, we store it under the ResearchPaper to enable easier filtering and aggregation of annotations for a given paper. The `userId` field is included in each annotation for security rule validation.\n\nThis structure avoids hierarchical authorization dependencies (`get()`) by denormalizing the necessary authorization context, enabling atomic operations and simplifying debugging. It supports the required QAPs by segregating data based on access needs and using membership models where appropriate."
+  }
+}
