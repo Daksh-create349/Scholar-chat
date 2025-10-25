@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export type Paper = {
   id: string;
   title: string;
@@ -13,6 +15,7 @@ export type Collection = {
   id: string;
   name: string;
   description: string;
-  paperCount: number;
-  lastUpdated: string;
+  userId: string;
+  createdAt: Timestamp;
+  paperIds: string[];
 };

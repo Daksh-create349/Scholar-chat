@@ -1,15 +1,36 @@
+'use client';
 import { DashboardNav } from "@/components/dashboard-nav";
 import { UserNav } from "@/components/user-nav";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, BookOpen } from "lucide-react";
+import { Menu, BookOpen, Loader2 } from "lucide-react";
 import Link from 'next/link';
+import { useUser } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.replace('/login');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || !user) {
+    return (
+        <div className="flex h-screen w-screen items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full flex">
       <aside className="hidden md:flex flex-col w-64 border-r bg-card">
@@ -25,7 +46,7 @@ export default function DashboardLayout({
               strokeLinejoin="round"
               className="h-6 w-6 text-primary"
             >
-              <path d="M3.5 2.7c.3 0 .6.1.8.4l1.8 2.9v11.5c0 .9-.7 1.6-1.6 1.6H3.5c-.9 0-1.6-.7-1.6-1.6V4.7c0-.9-.7-1.6 1.6-1.6h.1z"></path>
+              <path d="M3.5 2.7c.3 0 .6.1.8.4l1.8 2.9v11.5c0 .9-.7 1.6-1.6 1.6H3.5c-.9 0-1.6-.7-1.6-1.6V4.7c0-.9.7-1.6 1.6-1.6h.1z"></path>
               <path d="M20.5 2.7c-.3 0-.6.1-.8.4l-1.8 2.9v11.5c0 .9.7 1.6 1.6 1.6h1.1c.9 0 1.6-.7 1.6-1.6V4.7c0-.9-.7-1.6-1.6-1.6h-.1z"></path>
               <path d="M8.9 2.1l5.2 2.7c.3.1.5.4.5.8v13.2c0 .5-.3.9-.8 1L8.9 22.5c-.3-.2-.5-.5-.5-.8V2.9c0-.5.3-.9.8-1.2z"></path>
             </svg>

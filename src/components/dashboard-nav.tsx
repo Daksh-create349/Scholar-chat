@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,14 +10,10 @@ import {
   LineChart,
   MessageCircle,
   Bookmark,
-  Book,
+  LogOut,
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useAuth } from "@/firebase";
+import { signOut } from "firebase/auth";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -29,30 +25,43 @@ const navItems = [
 
 export function DashboardNav() {
   const pathname = usePathname();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    if (auth) {
+      await signOut(auth);
+      router.push('/login');
+    }
+  };
 
   return (
-    <nav className="flex flex-col gap-2 p-2">
-      <TooltipProvider>
+    <nav className="flex flex-col justify-between h-full p-2">
+      <div className="flex flex-col gap-2">
         {navItems.map((item) => (
-          <Tooltip key={item.href}>
-            <TooltipTrigger asChild>
-              <Button
-                asChild
-                variant={pathname === item.href ? "secondary" : "ghost"}
-                className="justify-start"
-              >
-                <Link href={item.href}>
-                  <item.icon className="h-5 w-5 mr-3" />
-                  <span className="truncate">{item.label}</span>
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={5}>
-              {item.label}
-            </TooltipContent>
-          </Tooltip>
+          <Button
+            key={item.href}
+            asChild
+            variant={pathname === item.href ? "secondary" : "ghost"}
+            className="justify-start"
+          >
+            <Link href={item.href}>
+              <item.icon className="h-5 w-5 mr-3" />
+              <span className="truncate">{item.label}</span>
+            </Link>
+          </Button>
         ))}
-      </TooltipProvider>
+      </div>
+      <div>
+        <Button
+          variant="ghost"
+          className="justify-start w-full"
+          onClick={handleSignOut}
+        >
+          <LogOut className="h-5 w-5 mr-3" />
+          <span className="truncate">Log out</span>
+        </Button>
+      </div>
     </nav>
   );
 }
