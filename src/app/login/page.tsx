@@ -53,10 +53,9 @@ export default function LoginPage() {
       if (error instanceof FirebaseError) {
         switch (error.code) {
           case 'auth/user-not-found':
-            errorMessage = 'No user found with this email. Please sign up.';
-            break;
           case 'auth/wrong-password':
-            errorMessage = 'Incorrect password. Please try again.';
+          case 'auth/invalid-credential':
+            errorMessage = 'Invalid email or password. Please try again.';
             break;
           case 'auth/email-already-in-use':
             errorMessage = 'This email is already in use. Please sign in.';
