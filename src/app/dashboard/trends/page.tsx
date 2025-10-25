@@ -133,7 +133,7 @@ export default function TrendsPage() {
                         <CardTitle className="text-base">Topic Frequency</CardTitle>
                     </CardHeader>
                     <CardContent>
-                         <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                         <ChartContainer config={chartConfig} className="h-[350px] w-full">
                             <ResponsiveContainer>
                                 <BarChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 40 }}>
                                 <CartesianGrid vertical={false} />
