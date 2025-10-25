@@ -1,4 +1,8 @@
+"use client";
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -12,6 +16,16 @@ import { ArrowRight, Book, Plus, Search as SearchIcon } from 'lucide-react';
 import { mockCollections } from '@/lib/mock-data';
 
 export default function Dashboard() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/dashboard/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -29,11 +43,17 @@ export default function Dashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSearchSubmit}>
             <div className="flex w-full items-center space-x-2">
               <div className="relative flex-grow">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input type="search" placeholder="e.g., 'Quantum computing breakthroughs 2024'" className="pl-10" />
+                <Input 
+                  type="search" 
+                  placeholder="e.g., 'Quantum computing breakthroughs 2024'" 
+                  className="pl-10" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
               <Button type="submit">Search</Button>
             </div>
