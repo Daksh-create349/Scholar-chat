@@ -14,7 +14,7 @@ export default function Home() {
         <source src="https://cdn.pixabay.com/video/2024/05/18/212509_large.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-      <div className="fixed top-0 left-0 w-full h-full bg-black/60 -z-10"></div>
+      <div className="fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-sm -z-10"></div>
 
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between animate-fade-in z-10">
         <div className="flex items-center gap-2">
