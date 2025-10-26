@@ -74,9 +74,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in-up animation-delay-300">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {heroImage && (
-              <div className="relative aspect-[16/9] w-full max-w-6xl mx-auto rounded-xl shadow-2xl overflow-hidden">
+              <div className="relative aspect-[16/9] w-full max-w-6xl mx-auto rounded-xl shadow-2xl overflow-hidden animate-fade-in-up" style={{animationDelay: '200ms'}}>
                 <Image
                   src={heroImage.imageUrl}
                   alt={heroImage.description}
@@ -99,7 +99,7 @@ export default function Home() {
             </div>
             <div className="mt-12 grid gap-8 md:grid-cols-3">
               {features.map((feature, i) => (
-                <Card key={feature.title} className={cn("text-center animate-fade-in-up")} style={{animationDelay: `${200 * (i + 1)}ms`}}>
+                <Card key={feature.title} className="text-center animate-fade-in-up" style={{animationDelay: `${200 * (i + 1)}ms`}}>
                   <CardHeader>
                     <div className="mx-auto bg-primary/10 rounded-full h-16 w-16 flex items-center justify-center">
                       {feature.icon}
@@ -115,8 +115,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-16 md:py-24 animate-fade-in-up">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 md:py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in-up">
             <div className="text-center">
               <h3 className="text-3xl md:text-4xl font-bold font-headline text-foreground">Everything You Need to Get Ahead</h3>
               <p className="mt-3 max-w-2xl mx-auto text-muted-foreground text-lg">
