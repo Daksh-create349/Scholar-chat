@@ -5,6 +5,24 @@
       "description": "A modern library with students researching",
       "imageUrl": "https://images.unsplash.com/photo-1693938973583-60c206f42db9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxsaWJyYXJ5JTIwcmVzZWFyY2h8ZW58MHx8fHwxNzYxMzg3NzI4fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "library research"
+    },
+    {
+      "id": "feature-search",
+      "description": "Abstract image representing AI-powered search",
+      "imageUrl": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkYXRhJTIwbmV0d29ya3xlbnwwfHx8fDE3NjE0NDk4ODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "data network"
+    },
+    {
+      "id": "feature-summarize",
+      "description": "Abstract image representing automated summarization",
+      "imageUrl": "https://images.unsplash.com/photo-1709651669999-57741c9bf085?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8YnJhaW4lMjBjaXJjdWl0fGVufDB8fHx8MTc2MTQ5NjY2M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "brain circuit"
+    },
+    {
+      "id": "feature-collaborate",
+      "description": "Abstract image representing collaboration",
+      "imageUrl": "https://images.unsplash.com/photo-1567177172939-9b0ee9d116d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0ZWFtd29yayUyMGNvbm5lY3Rpb258ZW58MHx8fHwxNzYxNDk2NjYzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "teamwork connection"
     }
   ]
 }
