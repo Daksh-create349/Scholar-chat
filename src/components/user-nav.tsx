@@ -15,9 +15,10 @@ import {
 import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { Settings } from "lucide-react";
+import { Settings, User } from "lucide-react";
 import { useState } from "react";
 import { SettingsDialog } from "./settings-dialog";
+import Link from "next/link";
 
 export function UserNav() {
   const auth = useAuth();
@@ -53,8 +54,11 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem disabled>
-            Profile
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/profile">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
             <Settings className="mr-2 h-4 w-4" />

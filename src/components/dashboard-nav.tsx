@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -12,6 +13,7 @@ import {
   Bookmark,
   FlaskConical,
   LogOut,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
@@ -23,6 +25,7 @@ const navItems = [
   { href: "/dashboard/chat", label: "Chat", icon: MessageCircle },
   { href: "/dashboard/collections", label: "Collections", icon: Bookmark },
   { href: "/dashboard/hypothesis", label: "Hypothesis", icon: FlaskConical },
+  { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
 
 export function DashboardNav() {
