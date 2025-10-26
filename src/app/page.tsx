@@ -93,7 +93,7 @@ export default function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center animate-fade-in-up">
               <h3 className="text-3xl md:text-4xl font-bold font-headline text-foreground">A New Paradigm in Research</h3>
-              <p className="mt-3 max-w-2xl mx-auto text-muted-foreground text-lg">
+              <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
                 Go beyond simple search. Understand the landscape of your field.
               </p>
             </div>
@@ -119,7 +119,7 @@ export default function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in-up">
             <div className="text-center">
               <h3 className="text-3xl md:text-4xl font-bold font-headline text-foreground">Everything You Need to Get Ahead</h3>
-              <p className="mt-3 max-w-2xl mx-auto text-muted-foreground text-lg">
+              <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
                 Packed with features for individual researchers and entire teams.
               </p>
             </div>
