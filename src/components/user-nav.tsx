@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -54,9 +55,6 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem disabled>
             Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled>
-            Billing
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
             <Settings className="mr-2 h-4 w-4" />
