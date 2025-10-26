@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Zap, BrainCircuit, Users } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { cn } from '@/lib/utils';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'landing-hero');
@@ -28,7 +29,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="container mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <header className="container mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between animate-fade-in">
         <div className="flex items-center gap-2">
            <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -56,7 +57,7 @@ export default function Home() {
         </nav>
       </header>
       <main className="flex-grow">
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center animate-fade-in-up">
           <h2 className="text-4xl md:text-6xl font-bold font-headline text-foreground tracking-tight">
             Synthesize Research at the Speed of Thought
           </h2>
@@ -73,7 +74,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in-up animation-delay-300">
             {heroImage && (
               <div className="relative aspect-[16/9] w-full max-w-6xl mx-auto rounded-xl shadow-2xl overflow-hidden">
                 <Image
@@ -90,15 +91,15 @@ export default function Home() {
 
         <section id="features" className="bg-secondary/50 py-16 md:py-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
+            <div className="text-center animate-fade-in-up">
               <h3 className="text-3xl md:text-4xl font-bold font-headline text-foreground">A New Paradigm in Research</h3>
               <p className="mt-3 max-w-2xl mx-auto text-muted-foreground text-lg">
                 Go beyond simple search. Understand the landscape of your field.
               </p>
             </div>
             <div className="mt-12 grid gap-8 md:grid-cols-3">
-              {features.map((feature) => (
-                <Card key={feature.title} className="text-center">
+              {features.map((feature, i) => (
+                <Card key={feature.title} className={cn("text-center animate-fade-in-up")} style={{animationDelay: `${200 * (i + 1)}ms`}}>
                   <CardHeader>
                     <div className="mx-auto bg-primary/10 rounded-full h-16 w-16 flex items-center justify-center">
                       {feature.icon}
@@ -114,7 +115,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-16 md:py-24">
+        <section className="py-16 md:py-24 animate-fade-in-up">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h3 className="text-3xl md:text-4xl font-bold font-headline text-foreground">Everything You Need to Get Ahead</h3>
