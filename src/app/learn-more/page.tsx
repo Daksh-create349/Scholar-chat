@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Zap, BrainCircuit, Users } from 'lucide-react';
 import Image from 'next/image';
@@ -13,6 +14,7 @@ export default function LearnMorePage() {
           title: 'AI-Powered Search',
           description: 'Instantly find top research papers and articles using our intelligent agent.',
           image: PlaceHolderImages.find(p => p.id === 'feature-search'),
+          videoUrl: 'https://cdn.pixabay.com/video/2023/10/30/187188-879640472_large.mp4',
         },
         {
           icon: <BrainCircuit className="h-8 w-8 text-primary" />,
@@ -69,16 +71,27 @@ export default function LearnMorePage() {
                 {features.map((feature, i) => (
                     <div key={feature.title} className="animate-fade-in-up" style={{animationDelay: `${200 * (i + 1)}ms`}}>
                         <Card className="text-center overflow-hidden h-full flex flex-col">
-                            {feature.image && (
-                                <Image 
-                                    src={feature.image.imageUrl}
-                                    alt={feature.description}
-                                    width={600}
-                                    height={400}
-                                    className="w-full h-48 object-cover"
-                                    data-ai-hint={feature.image.imageHint}
-                                />
-                            )}
+                            <div className="relative w-full h-48 bg-black">
+                                {feature.videoUrl ? (
+                                    <video
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                        className="absolute top-0 left-0 w-full h-full object-cover"
+                                    >
+                                        <source src={feature.videoUrl} type="video/mp4" />
+                                    </video>
+                                ) : feature.image && (
+                                    <Image 
+                                        src={feature.image.imageUrl}
+                                        alt={feature.description}
+                                        fill
+                                        className="object-cover"
+                                        data-ai-hint={feature.image.imageHint}
+                                    />
+                                )}
+                            </div>
                             <CardHeader>
                                 <div className="mx-auto bg-primary/10 rounded-full h-16 w-16 flex items-center justify-center">
                                     {feature.icon}
