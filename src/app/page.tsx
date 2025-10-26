@@ -32,7 +32,7 @@ export default function Home() {
           </Button>
         </nav>
       </header>
-      <main className="flex-grow">
+      <main className="flex-grow flex items-center">
         <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center animate-fade-in-up">
           <h2 className="text-4xl md:text-6xl font-bold font-headline text-foreground tracking-tight">
             Synthesize Research at the Speed of Thought
@@ -50,7 +50,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="bg-secondary/50 py-8">
+      <footer className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Scholar Chat. All rights reserved.</p>
         </div>
