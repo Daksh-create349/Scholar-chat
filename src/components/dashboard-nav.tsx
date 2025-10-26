@@ -10,6 +10,7 @@ import {
   LineChart,
   MessageCircle,
   Bookmark,
+  FlaskConical,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/firebase";
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/dashboard/trends", label: "Trends", icon: LineChart },
   { href: "/dashboard/chat", label: "Chat", icon: MessageCircle },
   { href: "/dashboard/collections", label: "Collections", icon: Bookmark },
+  { href: "/dashboard/hypothesis", label: "Hypothesis", icon: FlaskConical },
 ];
 
 export function DashboardNav() {
