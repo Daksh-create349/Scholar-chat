@@ -32,93 +32,69 @@ export function PaperActionDialog({ paper, open, onOpenChange }: PaperActionDial
       const { keyFindings, implications } = await summarizeResearchPaper({ paperText: paper.abstract });
 
       const doc = new jsPDF({
-        orientation: 'p',
+        orientation: 'landscape',
         unit: 'pt',
         format: 'a4'
       });
       const margin = 40;
       const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       const contentWidth = pageWidth - (margin * 2);
-      let y = 0;
 
-      // Title
+      // Slide 1: Title Slide
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(20);
-      const titleLines = doc.splitTextToSize(paper.title, contentWidth);
-      y = margin + 10;
-      doc.text(titleLines, margin, y);
-      y += titleLines.length * 20;
-
-      // Authors
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      const authorText = `By: ${paper.authors.join(', ')}`;
-      const authorLines = doc.splitTextToSize(authorText, contentWidth);
-      y += 10;
-      doc.text(authorLines, margin, y);
-      y += authorLines.length * 10;
+      doc.setFontSize(36);
+      const titleLines = doc.splitTextToSize(paper.title, contentWidth * 0.9);
+      doc.text(titleLines, pageWidth / 2, pageHeight / 2 - 40, { align: 'center' });
       
-      // Meta Info
-      y += 5;
-      doc.setFontSize(9);
-      doc.setTextColor(100);
-      const metaText = `Published: ${paper.publicationDate || 'N/A'}  |  Citations: ${paper.citations > 0 ? paper.citations.toLocaleString() : 'N/A'}`;
-      doc.text(metaText, margin, y);
-      y += 15;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(16);
+      const authorText = paper.authors.join(', ');
+      const authorLines = doc.splitTextToSize(authorText, contentWidth * 0.8);
+      doc.text(authorLines, pageWidth / 2, pageHeight / 2 + (titleLines.length * 20), { align: 'center' });
 
-      // Separator
-      doc.setDrawColor(220, 220, 220);
-      doc.line(margin, y, pageWidth - margin, y);
-      y += 20;
-
-      // AI Summary Section
+      // Slide 2: Key Findings
+      doc.addPage();
       doc.setFont('helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.text('Key Findings', margin, margin);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(14);
+      const findingsLines = doc.splitTextToSize(keyFindings.map(f => `• ${f}`).join('\n'), contentWidth);
+      doc.text(findingsLines, margin, margin + 40);
+
+      // Slide 3: Implications
+      doc.addPage();
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.text('Implications & Significance', margin, margin);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(14);
+      const implicationsLines = doc.splitTextToSize(implications.map(i => `• ${i}`).join('\n'), contentWidth);
+      doc.text(implicationsLines, margin, margin + 40);
+
+      // Slide 4: Original Abstract
+      doc.addPage();
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.text('Original Abstract', margin, margin);
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(12);
-      doc.setTextColor(0);
-      doc.text('AI-Generated Insights', margin, y);
-      y += 15;
-      
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text('Key Findings:', margin, y);
-      y += 12;
-      doc.setFont('helvetica', 'normal');
-      const findingsLines = doc.splitTextToSize(`- ${keyFindings.join('\n- ')}`, contentWidth - 10);
-      doc.text(findingsLines, margin + 10, y);
-      y += (findingsLines.length * 10) + 10;
-      
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text('Implications:', margin, y);
-      y += 12;
-      doc.setFont('helvetica', 'normal');
-      const implicationsLines = doc.splitTextToSize(`- ${implications.join('\n- ')}`, contentWidth - 10);
-      doc.text(implicationsLines, margin + 10, y);
-      y += (implicationsLines.length * 10) + 20;
-
-      // Original Abstract Section
-      doc.setDrawColor(220, 220, 220);
-      doc.line(margin, y, pageWidth - margin, y);
-      y += 20;
-      
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text('Original Abstract', margin, y);
-      y += 15;
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
       const abstractLines = doc.splitTextToSize(paper.abstract, contentWidth);
-      doc.text(abstractLines, margin, y);
-      y += (abstractLines.length * 10) + 15;
+      doc.text(abstractLines, margin, margin + 40);
+
+      // Slide 5: Source
+      doc.addPage();
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.text('Source & Further Reading', margin, margin);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(14);
+      doc.text('You can access the full paper at the following URL:', margin, margin + 40);
+      doc.setTextColor(69, 90, 100);
+      doc.textWithLink(paper.url, margin, margin + 60, { url: paper.url });
       
-      // Footer with URL
-      doc.setFontSize(8);
-      doc.setTextColor(150);
-      doc.text(`Source: ${paper.url}`, margin, doc.internal.pageSize.getHeight() - margin + 10);
-
-
-      doc.save(`${paper.title.slice(0, 20).replace(/\s/g, '_')}_analysis.pdf`);
+      doc.save(`${paper.title.slice(0, 20).replace(/\s/g, '_')}_presentation.pdf`);
 
     } catch (error) {
       console.error("Failed to generate PDF summary", error);
