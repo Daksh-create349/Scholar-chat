@@ -1,8 +1,10 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -25,6 +27,7 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -38,8 +41,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import Link from 'next/link';
 
 const signUpSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
 });
@@ -77,7 +82,7 @@ export default function LoginPage() {
 
   const signUpForm = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { name: "", email: "", password: "" },
   });
 
 
@@ -139,7 +144,10 @@ export default function LoginPage() {
     if (!auth) return;
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      await updateProfile(userCredential.user, {
+        displayName: values.name,
+      })
       // onAuthStateChanged will handle the redirect
     } catch (error) {
         handleAuthError(error);
@@ -171,138 +179,165 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-background px-4">
-       <Tabs defaultValue="sign-in" className="w-full max-w-sm">
-        <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sign-in">Sign In</TabsTrigger>
-            <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
-        </TabsList>
-        <TabsContent value="sign-in">
-            <Card>
-            <CardHeader>
-                <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
-                <CardDescription>
-                Enter your credentials to access your account.
-                </CardDescription>
-            </CardHeader>
-            <Form {...signInForm}>
-              <form onSubmit={signInForm.handleSubmit(handleSignIn)}>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={signInForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="m@example.com" {...field} disabled={isLoading || isGoogleLoading}/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={signInForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} disabled={isLoading || isGoogleLoading} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-                <CardFooter className="flex-col gap-4">
-                    <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Sign In
-                    </Button>
-                    <div className="relative w-full">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
+    <div className="w-full h-screen flex items-center justify-center">
+        <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
+          <div className="flex items-center justify-center py-12">
+            <div className="mx-auto grid w-[350px] gap-6">
+                <Tabs defaultValue="sign-in" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="sign-in">Sign In</TabsTrigger>
+                        <TabsTrigger value="sign-up">Sign Up</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="sign-in">
+                         <div className="grid gap-2 text-center mt-8">
+                            <h1 className="text-3xl font-bold font-headline">Welcome Back</h1>
+                            <p className="text-balance text-muted-foreground">
+                                Enter your credentials to access your account
+                            </p>
+                         </div>
+                         <Form {...signInForm}>
+                          <form onSubmit={signInForm.handleSubmit(handleSignIn)}>
+                            <div className="grid gap-4 mt-4">
+                              <FormField
+                                control={signInForm.control}
+                                name="email"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="m@example.com" {...field} disabled={isLoading || isGoogleLoading}/>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={signInForm.control}
+                                name="password"
+                                render={({ field }) => (
+                                  <FormItem>
+                                     <div className="flex items-center">
+                                        <Label htmlFor="password">Password</Label>
+                                        <Link href="#" className="ml-auto inline-block text-sm underline">
+                                            Forgot your password?
+                                        </Link>
+                                    </div>
+                                    <FormControl>
+                                      <Input type="password" {...field} disabled={isLoading || isGoogleLoading} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
+                                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                  Sign In
+                              </Button>
+                               <div className="relative w-full">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">
+                                        Or continue with
+                                        </span>
+                                    </div>
+                                </div>
+                                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
+                                    {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
+                                    Google
+                                </Button>
+                            </div>
+                          </form>
+                        </Form>
+                    </TabsContent>
+                    <TabsContent value="sign-up">
+                        <div className="grid gap-2 text-center mt-8">
+                            <h1 className="text-3xl font-bold font-headline">Create an Account</h1>
+                            <p className="text-balance text-muted-foreground">
+                                Enter your information to create an account
+                            </p>
                         </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-background px-2 text-muted-foreground">
-                            Or continue with
-                            </span>
-                        </div>
-                    </div>
-                    <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
-                        {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-                        Google
-                    </Button>
-                </CardFooter>
-              </form>
-            </Form>
-            </Card>
-        </TabsContent>
-        <TabsContent value="sign-up">
-            <Card>
-            <CardHeader>
-                <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
-                <CardDescription>
-                Enter your email and password to get started.
-                </CardDescription>
-            </CardHeader>
-             <Form {...signUpForm}>
-              <form onSubmit={signUpForm.handleSubmit(handleSignUp)}>
-                <CardContent className="space-y-4">
-                    <FormField
-                        control={signUpForm.control}
-                        name="email"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                            <Input placeholder="m@example.com" {...field} disabled={isLoading || isGoogleLoading}/>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={signUpForm.control}
-                        name="password"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                            <Input type="password" {...field} disabled={isLoading || isGoogleLoading}/>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                </CardContent>
-                <CardFooter className="flex-col gap-4">
-                    <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Sign Up
-                    </Button>
-                    <div className="relative w-full">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-background px-2 text-muted-foreground">
-                            Or continue with
-                            </span>
-                        </div>
-                    </div>
-                    <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
-                        {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-                        Google
-                    </Button>
-                </CardFooter>
-              </form>
-            </Form>
-            </Card>
-        </TabsContent>
-        </Tabs>
+                         <Form {...signUpForm}>
+                          <form onSubmit={signUpForm.handleSubmit(handleSignUp)}>
+                            <div className="grid gap-4 mt-4">
+                                <FormField
+                                    control={signUpForm.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                        <Input placeholder="Jane Doe" {...field} disabled={isLoading || isGoogleLoading}/>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={signUpForm.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                        <Input placeholder="m@example.com" {...field} disabled={isLoading || isGoogleLoading}/>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={signUpForm.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                        <Input type="password" {...field} disabled={isLoading || isGoogleLoading}/>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                 <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
+                                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Sign Up
+                                </Button>
+                               <div className="relative w-full">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">
+                                        Or continue with
+                                        </span>
+                                    </div>
+                                </div>
+                                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
+                                    {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
+                                    Google
+                                </Button>
+                            </div>
+                          </form>
+                        </Form>
+                    </TabsContent>
+                </Tabs>
+            </div>
+          </div>
+          <div className="hidden bg-muted lg:block">
+            <Image
+              src="https://picsum.photos/seed/login-scholar/1200/1800"
+              alt="Image"
+              width="1920"
+              height="1080"
+              className="h-full w-full object-cover dark:brightness-[0.3] dark:grayscale"
+              data-ai-hint="library books"
+            />
+          </div>
+        </div>
     </div>
   );
 }
+
     
