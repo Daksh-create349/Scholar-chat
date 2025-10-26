@@ -1,13 +1,9 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Zap, BrainCircuit, Users } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { cn } from '@/lib/utils';
 
 export default function Home() {
-  const heroImage = PlaceHolderImages.find((img) => img.id === 'landing-hero');
 
   const features = [
     {
@@ -72,21 +68,6 @@ export default function Home() {
               <Link href="#features">Learn More</Link>
             </Button>
           </div>
-        </section>
-
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            {heroImage && (
-              <div className="relative aspect-[16/9] w-full max-w-6xl mx-auto rounded-xl shadow-2xl overflow-hidden animate-fade-in-up" style={{animationDelay: '200ms'}}>
-                <Image
-                  src={heroImage.imageUrl}
-                  alt={heroImage.description}
-                  fill
-                  className="object-cover"
-                  data-ai-hint={heroImage.imageHint}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              </div>
-            )}
         </section>
 
         <section id="features" className="bg-secondary/50 py-16 md:py-24">
