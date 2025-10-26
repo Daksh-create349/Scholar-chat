@@ -15,22 +15,22 @@ const PaperSearchSchema = z.object({
     abstract: z.string(),
 });
 
-export const searchPapers = ai.defineTool(
+// New flow to handle the actual fetch call in an unrestricted environment
+const searchSemanticScholar = ai.defineFlow(
   {
-    name: 'searchPapers',
-    description: 'Searches for research papers based on a query using the Semantic Scholar API.',
+    name: 'searchSemanticScholar',
     inputSchema: z.object({ query: z.string() }),
     outputSchema: z.array(PaperSearchSchema),
   },
   async (input) => {
-    console.log(`Searching for papers with query: ${input.query}`);
-    
     const searchUrl = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(input.query)}&fields=title,authors,abstract,url&limit=20`;
 
     try {
       const response = await fetch(searchUrl);
       if (!response.ok) {
-        throw new Error(`Semantic Scholar API request failed with status ${response.status}`);
+        // Log the error but return empty array to prevent crashing the main flow
+        console.error(`Semantic Scholar API request failed with status ${response.status}`);
+        return [];
       }
       const data = await response.json();
 
@@ -39,7 +39,7 @@ export const searchPapers = ai.defineTool(
       }
       
       const results = data.data
-        .filter((paper: any) => paper.title && paper.url && paper.abstract) // Filter out papers with missing essential fields
+        .filter((paper: any) => paper.title && paper.url && paper.abstract && paper.abstract.trim() !== '')
         .map((paper: any) => ({
           title: paper.title,
           authors: paper.authors ? paper.authors.map((author: any) => author.name) : [],
@@ -53,5 +53,20 @@ export const searchPapers = ai.defineTool(
       // Return an empty array or handle the error as appropriate
       return [];
     }
+  }
+);
+
+
+export const searchPapers = ai.defineTool(
+  {
+    name: 'searchPapers',
+    description: 'Searches for research papers based on a query.',
+    inputSchema: z.object({ query: z.string() }),
+    outputSchema: z.array(PaperSearchSchema),
+  },
+  async (input) => {
+    console.log(`Delegating search for query: ${input.query}`);
+    // The tool now calls the flow to perform the search
+    return await searchSemanticScholar(input);
   }
 );
