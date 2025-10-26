@@ -28,7 +28,7 @@ export default function LearnMorePage() {
           title: 'Collaborative Workspaces',
           description: 'Share, annotate, and discuss research with your team in a dedicated space.',
           image: PlaceHolderImages.find(p => p.id === 'feature-collaborate'),
-          videoUrl: 'https://cdn.pixabay.com/video/2017/03/08/8246-207598553_large.mp4',
+          videoUrl: 'https://cdn.pixabay.com/video/2023/06/22/168312-838884100_large.mp4',
         },
       ];
       
