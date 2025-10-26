@@ -313,6 +313,7 @@ export default function LoginPage() {
                                         Or continue with
                                         </span>
                                     </div>
+
                                 </div>
                                 <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
                                     {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
@@ -331,7 +332,7 @@ export default function LoginPage() {
               loop
               muted
               playsInline
-              className="h-full w-full object-cover dark:brightness-[0.3]"
+              className="h-full w-full object-cover"
             >
               <source src="https://cdn.pixabay.com/video/2025/10/26/312147.mp4" type="video/mp4" />
             </video>
@@ -340,5 +341,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
