@@ -325,15 +325,16 @@ export default function LoginPage() {
                 </Tabs>
             </div>
           </div>
-          <div className="hidden bg-muted lg:block">
-            <Image
-              src="https://picsum.photos/seed/login-scholar/1200/1800"
-              alt="Image"
-              width="1920"
-              height="1080"
-              className="h-full w-full object-cover dark:brightness-[0.3] dark:grayscale"
-              data-ai-hint="library books"
-            />
+          <div className="hidden bg-muted lg:block relative">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-full w-full object-cover dark:brightness-[0.3]"
+            >
+              <source src="https://cdn.pixabay.com/video/2025/10/26/312147.mp4" type="video/mp4" />
+            </video>
           </div>
         </div>
     </div>
