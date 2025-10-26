@@ -62,7 +62,7 @@ export function PaperActionDialog({ paper, open, onOpenChange }: PaperActionDial
       y += 5;
       doc.setFontSize(9);
       doc.setTextColor(100);
-      const metaText = `Published: ${paper.publicationDate || 'N/A'}  |  Citations: ${paper.citations.toLocaleString()}`;
+      const metaText = `Published: ${paper.publicationDate || 'N/A'}  |  Citations: ${paper.citations > 0 ? paper.citations.toLocaleString() : 'N/A'}`;
       doc.text(metaText, margin, y);
       y += 15;
 
@@ -152,15 +152,15 @@ export function PaperActionDialog({ paper, open, onOpenChange }: PaperActionDial
         <div className="flex flex-col gap-3 py-4">
             <a href={paper.url} target="_blank" rel="noopener noreferrer" className="w-full">
                 <Button variant="outline" className="w-full justify-start">
-                    <ExternalLink className="mr-2" />
+                    <ExternalLink className="mr-2 h-4 w-4" />
                     Open Original Link
                 </Button>
             </a>
             <Button onClick={handleDownloadPdf} disabled={isGenerating} className="w-full justify-start">
                 {isGenerating ? (
-                    <Loader2 className="mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                    <Download className="mr-2" />
+                    <Download className="mr-2 h-4 w-4" />
                 )}
                 <span>Download AI Analysis (PDF)</span>
             </Button>
