@@ -21,6 +21,7 @@ export default function LearnMorePage() {
           title: 'Automated Summarization',
           description: 'Get concise summaries and key findings for any paper, saving you hours of reading.',
           image: PlaceHolderImages.find(p => p.id === 'feature-summarize'),
+          videoUrl: 'https://cdn.pixabay.com/video/2017/01/26/7529-201118756_large.mp4',
         },
         {
           icon: <Users className="h-8 w-8 text-primary" />,
